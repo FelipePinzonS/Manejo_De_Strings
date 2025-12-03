@@ -105,33 +105,33 @@ Test cases:
 2) Border: "user@sub.domain.com" → true, "sub.domain.com"  
 3) Error: "invalid.email" → false
 """
-email_text = input("Enter email: ").strip()
-    
-# Validaciones
+# Leer el email
+email_text = input("Enter email address: ").strip()
+
+# Validar que no esté vacío
 if not email_text:
     print("Valid email: false")
-    exit()
-      
-if ' ' in email_text:
-    print("Valid email: false")
-    exit()
-      
-at_count = email_text.count('@')
-    
-if at_count != 1:
-    print("Valid email: false")
-    exit()
-    
-at_position = email_text.find('@')
-domain_part = email_text[at_position + 1:]
-    
-if '.' not in domain_part or domain_part.startswith('.'):
-    print("Valid email: false")
-    exit()
-    
-# Si pasa todas las validaciones, el email es válido
-print("Valid email: true")
-print(f"Domain: {domain_part}")
+else:
+    # Verificar que no contenga espacios
+    if " " in email_text:
+        print("Valid email: false")
+    else:
+        # Contar cuántos '@' hay
+        at_count = email_text.count('@')
+        
+        if at_count != 1:
+            print("Valid email: false")
+        else:
+            # Encontrar la posición del '@'
+            at_position = email_text.find('@')
+            domain_part = email_text[at_position + 1:]
+            
+            # Verificar que después del '@' haya al menos un '.'
+            if '.' in domain_part and domain_part.count('.') >= 1:
+                print("Valid email: true")
+                print(f"Domain: {domain_part}")
+            else:
+                print("Valid email: false")
 
 
 # Problem 3: Palindrome checker (ignoring spaces and case)
@@ -154,26 +154,30 @@ Test cases:
 2) Border: "o" → false (too short after cleaning)
 3) Error: "   " → Error message
 """
-phrase = input("Enter phrase: ").strip()
-    
-# Validaciones
+# Leer la frase
+phrase = input("Enter a phrase: ").strip()
+
+# Validar que no esté vacía
 if not phrase:
-    print("Error: Phrase cannot be empty")
-    exit()
-       
-# Normalizar: convertir a minúsculas y eliminar espacios
-normalized = phrase.lower().replace(' ', '')
+    print("Is palindrome: false")
+    print("Error: The phrase cannot be empty.")
+else:
+    # Normalizar la frase: convertir a minúsculas y quitar espacios
+    normalized_phrase = phrase.lower().replace(" ", "")
     
-if len(normalized) < 3:
-    print("Error: Phrase too short after normalization")
-    exit()
-    
-# Determinar si es palíndromo
-is_palindrome = normalized == normalized[::-1]
-    
-# Mostrar resultados
-print(f"Is palindrome: {str(is_palindrome).lower()}")
-print(f"Normalized: {normalized}")
+    # Validar longitud mínima después de limpiar espacios
+    if len(normalized_phrase) < 3:
+        print("Is palindrome: false")
+        print("Error: Phrase must have at least 3 characters after removing spaces.")
+    else:
+        # Verificar si es palíndromo comparando con su reverso
+        if normalized_phrase == normalized_phrase[::-1]:
+            print("Is palindrome: true")
+        else:
+            print("Is palindrome: false")
+        
+        # Mostrar la versión normalizada (opcional)
+        print(f"Normalized phrase: {normalized_phrase}")
 
 
 # Problem 4: Sentence word stats (lengths and first/last word)
@@ -254,33 +258,49 @@ Test cases:
 2) Border: "Xyz330" → weak (length < 8)
 3) Error: "" → Error message
 """
+# Leer la contraseña
 password_input = input("Enter password: ").strip()
-    
-# Validación: no aceptar contraseña vacía
+
+# Validar que no esté vacía
 if not password_input:
-    print("Error: Password cannot be empty")
-    exit()
-    
-# Verificar características
-has_upper = any(c.isupper() for c in password_input)
-has_lower = any(c.islower() for c in password_input) 
-has_digit = any(c.isdigit() for c in password_input)
-has_symbol = any(not c.isalnum() for c in password_input)
-    
-length = len(password_input)
-    
-# Clasificar fortaleza según reglas:
-# - Weak: longitud < 8 o solo minúsculas sin otros tipos de caracteres
-# - Strong: longitud >= 8 y contiene mayúsculas, minúsculas, dígitos y símbolos
-# - Medium: cualquier otro caso (longitud >= 8 con alguna combinación de tipos)
-if length < 8 or (has_lower and not has_upper and not has_digit and not has_symbol):
-    strength = "weak"
-elif has_upper and has_lower and has_digit and has_symbol and length >= 8:
-    strength = "strong"
+    print("Password strength: weak")
+    print("Error: Password cannot be empty.")
 else:
-    strength = "medium"
+    # Inicializar banderas para verificar criterios
+    has_upper = False
+    has_lower = False
+    has_digit = False
+    has_symbol = False
     
-print(f"Password strength: {strength}")
+    # Analizar cada carácter de la contraseña
+    for char in password_input:
+        if char.isupper():
+            has_upper = True
+        elif char.islower():
+            has_lower = True
+        elif char.isdigit():
+            has_digit = True
+        else:
+            # Si no es letra ni dígito, es símbolo
+            has_symbol = True
+    
+    # Obtener longitud
+    length = len(password_input)
+    
+    # Clasificar según reglas:
+    # WEAK: longitud < 8 O solo minúsculas O muy simple (solo letras sin mezcla)
+    # MEDIUM: longitud >= 8 Y (mezcla de mayúsculas/minúsculas O contiene dígitos)
+    # STRONG: longitud >= 8 Y tiene mayúsculas, minúsculas, dígitos y símbolos
+    
+    if length < 8 or (not has_upper and not has_digit and not has_symbol):
+        # Débil si es corta o si solo tiene minúsculas
+        print("Password strength: weak")
+    elif (has_upper and has_lower and has_digit and has_symbol) and length >= 8:
+        # Fuerte si tiene todos los criterios y longitud suficiente
+        print("Password strength: strong")
+    else:
+        # Medio para los casos intermedios
+        print("Password strength: medium")
 
 
 # Problem 6: Product label formatter (fixed-width text)
